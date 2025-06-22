@@ -5,10 +5,7 @@ const testApi = require('./api/test')
 const mongoose = require('mongoose')
 require('dotenv').config()
 mongoose.Promise = global.Promise
-mongoose.connect(process.env.DB_HOST, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.DB_HOST)
 const app = express()
 app.use(express.json())
 app.use(cors())

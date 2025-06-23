@@ -6,7 +6,6 @@ const addTest = async (req, res, next) => {
     const owner = req.user.username;
     try {
         const result = await service.addTest(title, questions, owner)
-
         res.status(201).json({
             status: "success",
             code: 201,
@@ -25,6 +24,20 @@ const getTests = async (req, res, next) => {
             status: "success",
             code: 200,
             data: tests
+        })
+    } catch(error){
+        console.error(error)
+        next(error)
+    }
+}
+
+const getTest = async (req, res, next) => {
+    try{
+        const test = await service.getTest(req.params.testId);
+        res.status(200).json({
+            status: "success",
+            code: 200,
+            data: test
         })
     } catch(error){
         console.error(error)
@@ -95,9 +108,27 @@ const removeTest = async (req, res, next) => {
     }
 }
 
+const editTest = async (req, res, next) => {
+    const { testId } = req.params;
+    const {title, questions} = req.body;
+    try{
+        const result = await service.editTest(testId, {title, questions})
+        res.status(201).json({
+            status: "success",
+            code: 201,
+            data: result
+        })
+    } catch(error){
+        console.log(error);
+        next(error);
+    }
+}
+
 module.exports = {
     addTest,
     getTests,
     removeTest,
-    getTeacherTests
+    getTeacherTests,
+    getTest,
+    editTest
 }

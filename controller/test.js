@@ -130,5 +130,5 @@ module.exports = {
     removeTest,
     getTeacherTests,
     getTest,
-    editTest
+    editTest,
 }

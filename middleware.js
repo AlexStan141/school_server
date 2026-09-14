@@ -28,12 +28,12 @@ const teacherAuth = (req, res, next) => {
 }
 
 const adminAuth = (req, res, next) => {
-    if (req.user.role !== "admin") {
+    if (req.user.role !== "director") {
         return res.status(401).json({
             status: "error",
             code: 401,
             message: "Unauthorized",
-            data: "You must be an admin for this action."
+            data: "You must be a director for this action."
         })
     }
     next();

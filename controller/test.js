@@ -2,11 +2,38 @@ const service = require("../service/test/methods")
 const userService = require("../service/user/methods")
 
 const addTest = async (req, res, next) => {
-    const { title, questions } = req.body;
+
     const owner = req.user.username;
+    const { title, questions } = req.body;
+
+    if(title == ""){
+        return res.json({
+            status: "error",
+            code: 500,
+            message: "Title is required"
+        });
+    }
+
+    if(questions.length == 0){
+        return res.json({
+            status: "error",
+            code: 500,
+            message: "Please insert at least one question"
+        });
+    }
+
+    let idx = questions.findIndex(question => question == "");
+    if(idx > -1){
+        return res.json({
+            status: "error",
+            code: 500,
+            message: "Please fill question " + (idx + 1)
+        });
+    }
+
     try {
         const result = await service.addTest(title, questions, owner)
-        res.status(201).json({
+        return res.status(201).json({
             status: "success",
             code: 201,
             data: result

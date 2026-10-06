@@ -138,6 +138,32 @@ const removeTest = async (req, res, next) => {
 const editTest = async (req, res, next) => {
     const { testId } = req.params;
     const {title, questions} = req.body;
+
+    if(title == ""){
+        return res.json({
+            status: "error",
+            code: 500,
+            message: "Title is required"
+        });
+    }
+
+    if(questions.length == 0){
+        return res.json({
+            status: "error",
+            code: 500,
+            message: "Please insert at least one question"
+        });
+    }
+
+    let idx = questions.findIndex(question => question == "");
+    if(idx > -1){
+        return res.json({
+            status: "error",
+            code: 500,
+            message: "Please fill question " + (idx + 1)
+        });
+    }
+
     try{
         const result = await service.editTest(testId, {title, questions})
         res.status(201).json({

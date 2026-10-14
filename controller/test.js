@@ -90,7 +90,7 @@ const getTeacherTests = async (req, res, next) => {
 
         //If the program reaches here it means that the user is a teacher and we can get his/her tests
         //If he/she has tests, we can display his/her tests, else we can display a suggestive message.
-        const tests = await service.getByOwner(user.username)
+        const tests = await service.getByOwner(user._id)
         if(tests.length > 0){
             res.json({
                 status: "success",

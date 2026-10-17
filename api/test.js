@@ -5,7 +5,7 @@ const middleware = require('../middleware')
 
 router.post("/", middleware.auth, middleware.teacherAuth, ctrlTest.addTest);
 router.get("/", ctrlTest.getTests);
-router.get("/:userId", ctrlTest.getTeacherTests);
+router.get("/owner/:userId", ctrlTest.getTeacherTests);
 router.get("/test/:testId", ctrlTest.getTest);
 router.put("/:testId", ctrlTest.editTest);
 router.delete("/:testId", ctrlTest.removeTest);

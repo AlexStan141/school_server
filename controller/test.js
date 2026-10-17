@@ -3,7 +3,7 @@ const userService = require("../service/user/methods")
 
 const addTest = async (req, res, next) => {
 
-    const owner = req.user.username;
+    const owner = req.user._id;
     const { title, questions } = req.body;
 
     if(title == ""){
@@ -74,8 +74,8 @@ const getTest = async (req, res, next) => {
 
 const getTeacherTests = async (req, res, next) => {
     const { userId } = req.params;
-    try{
 
+    try{
         //Verify if the user is a teacher
         //If is not a teacher the program throws an error
         const user = await userService.findById(userId)

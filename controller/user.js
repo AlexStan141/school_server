@@ -50,7 +50,7 @@ const login = async (req, res, next) => {
         }
 
         const payload = {
-            id: user.id,
+            id: user._id,
             username: user.username,
             email: user.email,
             role: user.role
@@ -67,7 +67,8 @@ const login = async (req, res, next) => {
                 user: {
                     username: user.username,
                     email: user.email,
-                    role: user.role
+                    role: user.role,
+                    _id: user._id
                 }
             },
         })

@@ -6,7 +6,13 @@ const addTest = async (req, res, next) => {
     const owner = req.user._id;
     const { title, nrDisplayedQuestions, questions } = req.body;
 
-    if(title.trim() == ""){
+    const trimmedTitle = title ? title.trim() : "";
+    const trimmedNrDisplayedQuestionsAsString = nrDisplayedQuestions ? nrDisplayedQuestions.toString().trim() : "";
+    const trimmedNrDisplayedQuestions = trimmedNrDisplayedQuestionsAsString ? parseInt(trimmedNrDisplayedQuestionsAsString) 
+                                                                            : 0;
+    const trimmedQuestions = questions.map(question => question ? question.trim() : "");
+
+    if(trimmedTitle == ""){
         return res.json({
             status: "error",
             code: 500,
@@ -14,7 +20,16 @@ const addTest = async (req, res, next) => {
         });
     }
 
-    if(nrDisplayedQuestions <= 0){
+    if(trimmedNrDisplayedQuestions != trimmedNrDisplayedQuestionsAsString){
+        return res.json({
+            status: "error",
+            code: 500,
+            message: "nrDisplayedQuestions must be a number"
+        });
+    }
+
+
+    if(trimmedNrDisplayedQuestions <= 0){
         return res.json({
             status: "error",
             code: 500,
@@ -22,7 +37,7 @@ const addTest = async (req, res, next) => {
         });
     }
 
-    if(nrDisplayedQuestions > questions.length){
+    if(trimmedNrDisplayedQuestions > trimmedQuestions.length){
         return res.json({
             status: "error",
             code: 500,
@@ -30,7 +45,7 @@ const addTest = async (req, res, next) => {
         });
     }
 
-    if(questions.length == 0){
+    if(trimmedQuestions.length == 0){
         return res.json({
             status: "error",
             code: 500,
@@ -38,7 +53,7 @@ const addTest = async (req, res, next) => {
         });
     }
 
-    let idx = questions.findIndex(question => question.trim() == "");
+    let idx = trimmedQuestions.findIndex(question => question == "");
     if(idx > -1){
         return res.json({
             status: "error",
@@ -48,7 +63,7 @@ const addTest = async (req, res, next) => {
     }
 
     try {
-        const result = await service.addTest(title, nrDisplayedQuestions, questions, owner)
+        const result = await service.addTest(trimmedTitle, trimmedNrDisplayedQuestions, trimmedQuestions, owner)
         return res.status(201).json({
             status: "success",
             code: 201,
@@ -155,7 +170,12 @@ const editTest = async (req, res, next) => {
     const { testId } = req.params;
     const {title, nrDisplayedQuestions, questions} = req.body;
 
-    if(title.trim() == ""){
+    const trimmedTitle = title ? title.trim() : "";
+    const trimmedNrDisplayedQuestionsAsString = nrDisplayedQuestions ? nrDisplayedQuestions.toString().trim() : "";
+    const trimmedNrDisplayedQuestions = trimmedNrDisplayedQuestionsAsString ? parseInt(trimmedNrDisplayedQuestionsAsString)                                                                            : 0;
+    const trimmedQuestions = questions.map(question => question ? question.trim() : "");
+
+    if(trimmedTitle == ""){
         return res.json({
             status: "error",
             code: 500,
@@ -163,7 +183,15 @@ const editTest = async (req, res, next) => {
         });
     }
 
-    if(nrDisplayedQuestions <= 0){
+    if(trimmedNrDisplayedQuestions != trimmedNrDisplayedQuestionsAsString){
+        return res.json({
+            status: "error",
+            code: 500,
+            message: "nrDisplayedQuestions must be a number"
+        });
+    }
+
+    if(trimmedNrDisplayedQuestions <= 0){
         return res.json({
             status: "error",
             code: 500,
@@ -171,9 +199,9 @@ const editTest = async (req, res, next) => {
         });
     }
 
-    if(questions){
+    if(trimmedQuestions){
 
-        if(nrDisplayedQuestions > questions.length){
+        if(trimmedNrDisplayedQuestions > trimmedQuestions.length){
             return res.json({
                 status: "error",
                 code: 500,
@@ -181,7 +209,7 @@ const editTest = async (req, res, next) => {
             });
         }
 
-        if(questions.length == 0){
+        if(trimmedQuestions.length == 0){
             return res.json({
                 status: "error",
                 code: 500,
@@ -189,7 +217,7 @@ const editTest = async (req, res, next) => {
             });
         }
 
-        let idx = questions.findIndex(question => question.trim() == "");
+        let idx = trimmedQuestions.findIndex(question => question == "");
         if(idx > -1){
             return res.json({
                 status: "error",
@@ -201,9 +229,9 @@ const editTest = async (req, res, next) => {
 
     try{
         const obj = {}
-        if(title) obj.title = title;
-        if(nrDisplayedQuestions) obj.nrDisplayedQuestions = nrDisplayedQuestions;
-        if(questions) obj.questions = questions;
+        if(trimmedTitle) obj.title = trimmedTitle;
+        if(trimmedNrDisplayedQuestions) obj.nrDisplayedQuestions = trimmedNrDisplayedQuestions;
+        if(trimmedQuestions) obj.questions = trimmedQuestions;
         const result = await service.editTest(testId, obj);
         res.status(201).json({
             status: "success",

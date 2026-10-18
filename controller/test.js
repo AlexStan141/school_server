@@ -6,7 +6,7 @@ const addTest = async (req, res, next) => {
     const owner = req.user._id;
     const { title, nrDisplayedQuestions, questions } = req.body;
 
-    if(title == ""){
+    if(title.trim() == ""){
         return res.json({
             status: "error",
             code: 500,
@@ -38,7 +38,7 @@ const addTest = async (req, res, next) => {
         });
     }
 
-    let idx = questions.findIndex(question => question == "");
+    let idx = questions.findIndex(question => question.trim() == "");
     if(idx > -1){
         return res.json({
             status: "error",
@@ -155,7 +155,7 @@ const editTest = async (req, res, next) => {
     const { testId } = req.params;
     const {title, nrDisplayedQuestions, questions} = req.body;
 
-    if(title == ""){
+    if(title.trim() == ""){
         return res.json({
             status: "error",
             code: 500,
@@ -189,7 +189,7 @@ const editTest = async (req, res, next) => {
             });
         }
 
-        let idx = questions.findIndex(question => question == "");
+        let idx = questions.findIndex(question => question.trim() == "");
         if(idx > -1){
             return res.json({
                 status: "error",

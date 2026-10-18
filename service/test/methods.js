@@ -1,7 +1,7 @@
 const Test = require('./schema');
 
-const addTest = (title, questions, owner) => {
-    return Test.create({title, questions, owner});
+const addTest = (title, nrDisplayedQuestions, questions, owner) => {
+    return Test.create({title, nrDisplayedQuestions, questions, owner});
 }
 
 const getTests = () => {

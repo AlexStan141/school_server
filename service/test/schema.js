@@ -7,6 +7,10 @@ const testSchema = new Schema({
         type: String,
         required: [true, "Test title is required."]
     },
+    nrDisplayedQuestions: {
+        type: Number,
+        required: [true, "Number of displayed questions is required."]
+    },
     questions: {
         type: [String],
         required: [true, "Questions are required."]

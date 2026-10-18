@@ -4,13 +4,29 @@ const userService = require("../service/user/methods")
 const addTest = async (req, res, next) => {
 
     const owner = req.user._id;
-    const { title, questions } = req.body;
+    const { title, nrDisplayedQuestions, questions } = req.body;
 
     if(title == ""){
         return res.json({
             status: "error",
             code: 500,
             message: "Title is required"
+        });
+    }
+
+    if(nrDisplayedQuestions <= 0){
+        return res.json({
+            status: "error",
+            code: 500,
+            message: "Invalid value. Total number of displayed questions is required"
+        });
+    }
+
+    if(nrDisplayedQuestions > questions.length){
+        return res.json({
+            status: "error",
+            code: 500,
+            message: "Total number of displayed questions must be smaller than total number of questions"
         });
     }
 
@@ -32,7 +48,7 @@ const addTest = async (req, res, next) => {
     }
 
     try {
-        const result = await service.addTest(title, questions, owner)
+        const result = await service.addTest(title, nrDisplayedQuestions, questions, owner)
         return res.status(201).json({
             status: "success",
             code: 201,
@@ -137,7 +153,7 @@ const removeTest = async (req, res, next) => {
 
 const editTest = async (req, res, next) => {
     const { testId } = req.params;
-    const {title, questions} = req.body;
+    const {title, nrDisplayedQuestions, questions} = req.body;
 
     if(title == ""){
         return res.json({
@@ -147,25 +163,48 @@ const editTest = async (req, res, next) => {
         });
     }
 
-    if(questions.length == 0){
+    if(nrDisplayedQuestions <= 0){
         return res.json({
             status: "error",
             code: 500,
-            message: "Please insert at least one question"
+            message: "Invalid value. Total number of displayed questions is required"
         });
     }
 
-    let idx = questions.findIndex(question => question == "");
-    if(idx > -1){
-        return res.json({
-            status: "error",
-            code: 500,
-            message: "Please fill question " + (idx + 1)
-        });
+    if(questions){
+
+        if(nrDisplayedQuestions > questions.length){
+            return res.json({
+                status: "error",
+                code: 500,
+                message: "Total number of displayed questions must be smaller than total number of questions"
+            });
+        }
+
+        if(questions.length == 0){
+            return res.json({
+                status: "error",
+                code: 500,
+                message: "Please insert at least one question"
+            });
+        }
+
+        let idx = questions.findIndex(question => question == "");
+        if(idx > -1){
+            return res.json({
+                status: "error",
+                code: 500,
+                message: "Please fill question " + (idx + 1)
+            });
+        }
     }
 
     try{
-        const result = await service.editTest(testId, {title, questions})
+        const obj = {}
+        if(title) obj.title = title;
+        if(nrDisplayedQuestions) obj.nrDisplayedQuestions = nrDisplayedQuestions;
+        if(questions) obj.questions = questions;
+        const result = await service.editTest(testId, obj);
         res.status(201).json({
             status: "success",
             code: 201,

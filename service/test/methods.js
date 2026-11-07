@@ -1,15 +1,15 @@
 const Test = require('./schema');
 
-const addTest = (title, nrDisplayedQuestions, questions, owner) => {
-    return Test.create({title, nrDisplayedQuestions, questions, owner});
+const addTest = (title, nrDisplayedQuestions, questions, owner, year, promotionScore) => {
+    return Test.create({title, nrDisplayedQuestions, questions, owner, year, promotionScore});
 }
 
 const getTests = () => {
     return Test.find();
 }
 
-const getByOwner = (username) => {
-    return Test.find({owner: username})
+const getByOwner = (userId) => {
+    return Test.find({owner: userId})
 }
 
 const getTest = (testId) => {
@@ -24,7 +24,7 @@ const removeTest = (testId) => {
     return Test.findByIdAndDelete(testId);
 }
 
- 
+
 module.exports = {
     addTest,
     getTests,

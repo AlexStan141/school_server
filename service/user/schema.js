@@ -21,6 +21,26 @@ const userSchema = new Schema({
   role: {
     type: String,
     required: [true, "Role is required"]
+  },
+  school: {
+    type: String,
+    required: [true, "School is required"]
+  },
+  startYear: {
+    type: Number,
+    required: [true, "Start year is required"]
+  },
+  endYear: {
+    type: Number,
+    required: false
+  },
+  classYear: {
+    type: Number,
+    required: false
+  },
+  subject: {
+    type: [String],
+    required: false
   }
 });
 

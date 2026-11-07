@@ -4,44 +4,96 @@ const userService = require("../service/user/methods")
 const addTest = async (req, res, next) => {
 
     const owner = req.user._id;
-    const { title, nrDisplayedQuestions, questions } = req.body;
+    const { title, nrDisplayedQuestions, questions, year, promotionScore} = req.body;
 
-    const trimmedTitle = title ? title.trim() : "";
-    const trimmedNrDisplayedQuestionsAsString = nrDisplayedQuestions ? nrDisplayedQuestions.toString().trim() : "";
-    const trimmedNrDisplayedQuestions = trimmedNrDisplayedQuestionsAsString ? parseInt(trimmedNrDisplayedQuestionsAsString) 
-                                                                            : 0;
-    const trimmedQuestions = questions.map(question => question ? question.trim() : "");
+    const trimmedTitle = title.trim();
+    const trimmedQuestions = questions.map(question => question.trim());
 
-    if(trimmedTitle == ""){
+    if(!trimmedTitle){
         return res.json({
             status: "error",
-            code: 500,
+            code: 400,
             message: "Title is required"
         });
     }
 
-    if(trimmedNrDisplayedQuestions != trimmedNrDisplayedQuestionsAsString){
+    if(!nrDisplayedQuestions){
         return res.json({
             status: "error",
-            code: 500,
-            message: "nrDisplayedQuestions must be a number"
+            code: 400,
+            message: "Number of displayed questions is required"
         });
     }
 
-
-    if(trimmedNrDisplayedQuestions <= 0){
+    if(nrDisplayedQuestions != parseInt(nrDisplayedQuestions)){
         return res.json({
             status: "error",
-            code: 500,
-            message: "Invalid value. Total number of displayed questions is required"
+            code: 400,
+            message: "Number of displayed questions must be an integer"
         });
     }
 
-    if(trimmedNrDisplayedQuestions > trimmedQuestions.length){
+    if(nrDisplayedQuestions <= 0){
         return res.json({
             status: "error",
             code: 500,
-            message: "Total number of displayed questions must be smaller than total number of questions"
+            message: "Number of displayed questions must be greater or equal to 1."
+        });
+    }
+
+    if(!year){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Year is required"
+        });
+    }
+
+    if(year != parseInt(year)){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Year must be an integer"
+        });
+    }
+
+    if(year < 1 || year > 8){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Year must be between 1 and 8"
+        });
+    }
+
+    if(!promotionScore){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Promotion score is required"
+        });
+    }
+
+    if(promotionScore != parseFloat(promotionScore)){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Promotion score must be a number"
+        });
+    }
+
+    if(promotionScore < 50 || promotionScore > 80){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Promotion score must be between 50 and 80"
+        });
+    }
+
+    if(nrDisplayedQuestions > trimmedQuestions.length){
+        return res.json({
+            status: "error",
+            code: 500,
+            message: "Total number of displayed questions must be smaller than or equal to total number of questions"
         });
     }
 
@@ -63,7 +115,7 @@ const addTest = async (req, res, next) => {
     }
 
     try {
-        const result = await service.addTest(trimmedTitle, trimmedNrDisplayedQuestions, trimmedQuestions, owner)
+        const result = await service.addTest(trimmedTitle, nrDisplayedQuestions, trimmedQuestions, owner, year, promotionScore)
         return res.status(201).json({
             status: "success",
             code: 201,
@@ -168,52 +220,93 @@ const removeTest = async (req, res, next) => {
 
 const editTest = async (req, res, next) => {
     const { testId } = req.params;
-    const {title, nrDisplayedQuestions, questions} = req.body;
 
-    const trimmedTitle = title ? title.trim() : "";
-    const trimmedNrDisplayedQuestionsAsString = nrDisplayedQuestions ? nrDisplayedQuestions.toString().trim() : "";
-    const trimmedNrDisplayedQuestions = trimmedNrDisplayedQuestionsAsString ? parseInt(trimmedNrDisplayedQuestionsAsString)                                                                            : 0;
-    const trimmedQuestions = questions.map(question => question ? question.trim() : "");
+    const owner = req.user._id;
+    const testToEdit = await service.getTest(testId);
 
-    if(trimmedTitle == ""){
+    if(!testToEdit){
         return res.json({
             status: "error",
-            code: 500,
+            code: 404,
+            data: "Test not found"
+        })
+    }
+
+    if(testToEdit.owner.toString() !== owner.toString()){
+        return res.json({
+            status: "error",
+            code: 403,
+            data: "You are not the owner of the test"
+        })
+    }
+
+    const {title, nrDisplayedQuestions, questions, year, promotionScore} = req.body;
+
+    if(title == ""){
+        return res.json({
+            status: "error",
+            code: 400,
             message: "Title is required"
-        });
+        })
     }
 
-    if(trimmedNrDisplayedQuestions != trimmedNrDisplayedQuestionsAsString){
+    if(nrDisplayedQuestions == ""){
         return res.json({
             status: "error",
-            code: 500,
-            message: "nrDisplayedQuestions must be a number"
-        });
+            code: 400,
+            message: "Number of displayed questions is required"
+        })
     }
 
-    if(trimmedNrDisplayedQuestions <= 0){
+    if(year == ""){
         return res.json({
             status: "error",
-            code: 500,
-            message: "Invalid value. Total number of displayed questions is required"
+            code: 400,
+            message: "Year is required"
+        })
+    }
+
+    if(promotionScore == ""){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Promotion score is required"
+        })
+    }
+
+    if(nrDisplayedQuestions != parseInt(nrDisplayedQuestions)){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Number of displayed questions must be an integer"
         });
     }
 
-    if(trimmedQuestions){
+    if(nrDisplayedQuestions <= 0){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Number of displayed questions must be greater or equal to 1."
+        });
+    }
 
-        if(trimmedNrDisplayedQuestions > trimmedQuestions.length){
+    if(questions){
+
+        if(questions.length == 0){
             return res.json({
                 status: "error",
-                code: 500,
-                message: "Total number of displayed questions must be smaller than total number of questions"
+                code: 400,
+                message: "The test must have a least one question."
             });
         }
 
-        if(trimmedQuestions.length == 0){
+        const trimmedQuestions = questions.map(question => question.trim());
+
+        if(nrDisplayedQuestions && nrDisplayedQuestions > questions.length){
             return res.json({
                 status: "error",
-                code: 500,
-                message: "Please insert at least one question"
+                code: 400,
+                message: "Total number of displayed questions must be smaller than or equal to total number of questions"
             });
         }
 
@@ -221,17 +314,52 @@ const editTest = async (req, res, next) => {
         if(idx > -1){
             return res.json({
                 status: "error",
-                code: 500,
+                code: 400,
                 message: "Please fill question " + (idx + 1)
             });
         }
+
+    }  
+        
+    if(year != parseInt(year)){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Year must be an integer"
+        })
     }
+
+    if(year < 1 || year > 8){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Year must be between 1 and 8"
+        })
+    }
+
+    if(promotionScore != parseFloat(promotionScore)){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Promotion score must be a number"
+        })
+    }
+    if(promotionScore < 50 || promotionScore > 100){
+        return res.json({
+            status: "error",
+            code: 400,
+            message: "Promotion score must be between 50 and 100"
+        })
+    }
+
 
     try{
         const obj = {}
-        if(trimmedTitle) obj.title = trimmedTitle;
-        if(trimmedNrDisplayedQuestions) obj.nrDisplayedQuestions = trimmedNrDisplayedQuestions;
-        if(trimmedQuestions) obj.questions = trimmedQuestions;
+        obj.title = title.trim();
+        obj.nrDisplayedQuestions = nrDisplayedQuestions;
+        obj.questions = questions.map(question => question.trim());
+        obj.year = year;
+        obj.promotionScore = promotionScore;
         const result = await service.editTest(testId, obj);
         res.status(201).json({
             status: "success",

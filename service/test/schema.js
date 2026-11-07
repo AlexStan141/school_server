@@ -18,6 +18,14 @@ const testSchema = new Schema({
     owner: {
         type: String,
         required: [true, "Owner is required"]
+    },
+    year: {
+        type: Number,
+        required: [true, "Year is required"]
+    },
+    promotionScore: {
+        type: Number,
+        required: [true, "Promotion score is required"]
     }
 })
 

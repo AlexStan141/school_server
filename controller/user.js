@@ -79,11 +79,15 @@ const login = async (req, res, next) => {
 }
 
 const register = async (req, res, next) => {
-    const { username, email, password, role } = req.body;
+    const { username, 
+        email, password, 
+        role, school, 
+        startYear
+    } = req.body;
     try {
 
-        const valuesToValidate = [username, email, password, role]
-        const fields = ["username", "email", "password", "role"]
+        const valuesToValidate = [username, email, password, role, school, startYear]
+        const fields = ["username", "email", "password", "role", "school", "start year"]
 
         for (let i = 0; i < valuesToValidate.length; i++) {
             if (!valuesToValidate[i]) {
@@ -123,23 +127,40 @@ const register = async (req, res, next) => {
             })
         }
 
-        const user = await service.findByEmail(email)
-        if (user) {
-            return res.status(409).json({
+        if(!school || school == "none"){
+            return res.json({
                 status: "error",
-                code: 409,
-                message: "Email is already in use.",
-                data: "Conflict"
+                code: 400,
+                message: `Please complete the school field.`
             })
         }
-        const newUser = new User({ username, email, role })
+
+        if(startYear != parseInt(startYear)){
+            return res.json({
+                status: "error",
+                code: 400,
+                message: `Please insert a valid start year.`
+            })
+        }
+
+        const user = await service.findByEmail(email)
+        if (user) {
+            return res.json({
+                status: "error",
+                code: 409,
+                message: "Email is already in use."
+            })
+        }
+        const newUser = new User({ username, email, role, school, startYear})
         newUser.setPassword(password)
 
         const payload = {
             id: newUser.id,
             username: newUser.username,
             email: newUser.email,
-            role: newUser.role
+            role: newUser.role,
+            school: newUser.school,
+            startYear: newUser.startYear,
         }
 
         const secret = process.env.SECRET;
@@ -155,7 +176,12 @@ const register = async (req, res, next) => {
                     user: {
                         username: newUser.username,
                         email: newUser.email,
-                        role: newUser.role
+                        role: newUser.role,
+                        school: newUser.school,
+                        startYear: newUser.startYear,
+                        endYear: newUser.endYear,
+                        classYear: newUser.classYear,
+                        subject: newUser.subject
                     }
                 }
             })

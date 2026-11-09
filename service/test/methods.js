@@ -1,4 +1,5 @@
 const Test = require('./schema');
+const mongoose = require('mongoose');
 
 const addTest = (title, nrDisplayedQuestions, questions, owner, year, promotionScore) => {
     return Test.create({title, nrDisplayedQuestions, questions, owner, year, promotionScore});
@@ -9,7 +10,7 @@ const getTests = () => {
 }
 
 const getByOwner = (userId) => {
-    return Test.find({owner: userId})
+    return Test.find({owner: userId});
 }
 
 const getTest = (testId) => {
